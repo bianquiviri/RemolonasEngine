@@ -13,10 +13,10 @@ if [ ! -d "vendor" ]; then
     fi
 fi
 
-# NPM install
+# NPM install and build in background to prevent 502 bad gateway during startup
 if [ ! -d "node_modules" ] && [ -f "package.json" ]; then
-    echo "Running npm install..."
-    npm install
+    echo "Running npm install in background..."
+    (npm install && npm run build) &
 fi
 
 # Ensure permissions
