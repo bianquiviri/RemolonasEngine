@@ -16,7 +16,7 @@ class GenerateWeeklyOrdersCommandTest extends TestCase
 
     public function test_generates_weekly_orders_dispatches_jobs_for_active_subscriptions_due_within_7_days()
     {
-        Queue::fake();
+    Queue::fake();
 
         $user = User::factory()->create();
         $plan = Plan::create(['name' => 'Caja Frutas', 'price' => 20]);
