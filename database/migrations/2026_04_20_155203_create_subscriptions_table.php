@@ -11,9 +11,10 @@ return new class extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('plan_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('plan_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['active', 'paused', 'cancelled'])->default('active');
-            $table->date('next_delivery_date');
+            $table->string('delivery_day')->default('Friday');
+            $table->date('next_delivery_date')->nullable();
             $table->enum('frequency', ['weekly', 'monthly'])->default('weekly');
             $table->timestamps();
             $table->softDeletes();

@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('subscription_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'failed'])->default('pending');
+            $table->foreignUuid('store_id')->nullable()->constrained()->onDelete('set null');
+            $table->enum('status', ['pending', 'picking', 'ready_for_dispatch', 'delivered', 'failed'])->default('pending');
             $table->date('scheduled_delivery_date');
             $table->jsonb('error_log')->nullable();
             $table->timestamps();

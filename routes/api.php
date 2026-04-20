@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\StoreController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\PickingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,5 +47,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/dashboard/customer', [DashboardController::class, 'customer'])->middleware('role:customer');
         Route::get('/dashboard/operator', [DashboardController::class, 'operator'])->middleware('role:operator');
         Route::get('/dashboard/supervisor', [DashboardController::class, 'supervisor'])->middleware('role:supervisor');
+
+        // Picking Workflow
+        Route::prefix('picking')->group(function () {
+            Route::get('/order/{order}', [PickingController::class, 'getOrderItems']);
+            Route::post('/scan', [PickingController::class, 'scanItem']);
+            Route::post('/complete/{order}', [PickingController::class, 'completePicking']);
+        })->middleware('role:operator|supervisor');
     });
 });

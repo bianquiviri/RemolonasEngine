@@ -57,7 +57,7 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/login",
-     *     summary="Inicio de sesión",
+     *     summary="Inicio de sesión con redirección dinámica",
      *     tags={"Auth"},
      *     @OA\RequestBody(
      *         required=true,
@@ -76,21 +76,40 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        // Rate Limiting: 5 intentos por minuto por email/ip
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($request->email, 5)) {
+            return response()->json([
+                'message' => 'Demasiados intentos de inicio de sesión. Por favor, inténtelo de nuevo en un minuto.'
+            ], 429);
+        }
+
         $user = User::where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
+            \Illuminate\Support\Facades\RateLimiter::hit($request->email);
             throw ValidationException::withMessages([
                 'email' => ['Las credenciales proporcionadas son incorrectas.'],
             ]);
         }
 
+        \Illuminate\Support\Facades\RateLimiter::clear($request->email);
+
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Redirección dinámica basada en rol
+        $redirectPath = '/app/home';
+        if ($user->hasRole('supervisor')) {
+            $redirectPath = '/admin/dashboard';
+        } elseif ($user->hasRole('operator')) {
+            $redirectPath = '/store/picking';
+        }
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => $user,
-            'roles' => $user->getRoleNames()
+            'roles' => $user->getRoleNames(),
+            'redirect_path' => $redirectPath
         ]);
     }
 

@@ -28,6 +28,15 @@ class Order extends Model
         'scheduled_delivery_date' => 'date',
     ];
 
+    protected static function booted()
+    {
+        static::updated(function ($order) {
+            if ($order->isDirty('status')) {
+                event(new \App\Events\OrderStatusChanged($order));
+            }
+        });
+    }
+
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);
@@ -36,5 +45,10 @@ class Order extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

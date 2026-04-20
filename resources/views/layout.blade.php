@@ -14,12 +14,14 @@
     <style>
         :root {
             --primary: #2E7D32;
+            --primary-light: #88d982;
             --secondary: #E67E22;
-            --background: #FDFBF7;
-            --surface: #FFFFFF;
-            --text-main: #1B1C1A;
-            --text-muted: #40493D;
-            --radius: 16px;
+            --background: #0a0a0a;
+            --surface: rgba(255, 255, 255, 0.03);
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --radius: 24px;
         }
 
         body {
@@ -27,28 +29,31 @@
             background-color: var(--background);
             color: var(--text-main);
             margin: 0;
-            line-height: 1.5;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
         h1, h2, h3 {
             font-family: 'Newsreader', serif;
-            font-weight: 600;
+            font-weight: 500;
+            letter-spacing: -0.02em;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 24px;
         }
 
         nav {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
             z-index: 100;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .nav-content {
@@ -59,67 +64,103 @@
 
         .logo {
             font-family: 'Newsreader', serif;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            color: var(--primary);
+            color: white;
             text-decoration: none;
+            font-style: italic;
         }
 
-        .nav-links a {
-            margin-left: 20px;
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a, .nav-links button {
             text-decoration: none;
-            color: var(--text-main);
-            font-weight: 500;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .nav-links a:hover, .nav-links button:hover {
+            color: white;
         }
 
         .btn {
             display: inline-block;
-            padding: 12px 24px;
-            border-radius: var(--radius);
-            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 14px;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: all 0.3s;
             cursor: pointer;
             border: none;
+            font-family: 'Manrope', sans-serif;
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #1B5E20);
             color: white;
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
         }
 
         .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(46, 125, 50, 0.5);
         }
 
         .card {
             background: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
             border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            margin-bottom: 24px;
+            padding: 32px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         footer {
-            padding: 60px 0;
+            padding: 80px 0 40px;
             text-align: center;
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 13px;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 60px;
         }
 
         .sre-badge {
             display: inline-block;
-            padding: 4px 12px;
-            background: rgba(46, 125, 50, 0.1);
-            color: var(--primary);
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
+            padding: 6px 16px;
+            background: rgba(136, 217, 130, 0.05);
+            color: var(--primary-light);
+            border: 1px solid rgba(136, 217, 130, 0.1);
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 10px;
+            letter-spacing: 0.1em;
+            margin-top: 15px;
+        }
+
+        /* Utility for Glass Layouts */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
         }
     </style>
     @yield('styles')
@@ -131,7 +172,15 @@
             <div class="nav-links">
                 <a href="/">Inicio</a>
                 <a href="/plans">Planes</a>
-                <a href="/dashboard">Dashboard</a>
+                @auth
+                    <a href="/dashboard">Dashboard</a>
+                    <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                        @csrf
+                        <button type="submit" style="background: none; border: none; font-weight: 500; font-size: 14px; color: var(--text-main); cursor: pointer; margin-left: 20px;">Salir</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}">Entrar</a>
+                @endauth
             </div>
         </div>
     </nav>
