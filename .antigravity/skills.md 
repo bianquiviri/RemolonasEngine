@@ -60,3 +60,8 @@ Este documento define las identidades, capacidades técnicas y protocolos de col
 2.  **Validación de QA:** El **QA** genera los tests basados en ese contrato de Swagger.
 3.  **Implementación:** El **Developer** escribe el código para que los tests pasen.
 4.  **Auditoría SRE:** El **SRE** verifica que la documentación sea accesible y que el performance del endpoint sea óptimo.
+
+### 🔑 Multi-User Management Skill
+* **RBAC Implementation:** Capacidad para segregar datos. El Supervisor ve `Order::all()`, el Operador ve `Order::where('store_id', $id)`, el Cliente ve `Order::where('user_id', $id)`.
+* **Contract Testing:** El QA debe testear que los esquemas de Swagger cambian según el rol (un cliente no debe recibir el campo `profit_margin` en su JSON).
+* **Frontend Routing:** El SRE debe implementar rutas protegidas en el Frontend que redirijan al dashboard correcto según el JWT del usuario.
