@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\StoreController;
 use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,10 @@ Route::get('/health', function () {
 });
 
 Route::prefix('v1')->group(function () {
+    // Auth routes
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+
     // Public routes
     Route::get('/plans', [PlanController::class, 'index']);
     Route::get('/plans/{plan}', [PlanController::class, 'show']);
@@ -22,6 +27,7 @@ Route::prefix('v1')->group(function () {
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
         Route::apiResource('subscriptions', SubscriptionController::class);
         
         // Orders workflow
